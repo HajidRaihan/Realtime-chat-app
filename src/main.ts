@@ -5,14 +5,14 @@ import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api')
+  app.setGlobalPrefix('api');
   app.use(
     session({
       secret: 'asiodasjoddjdoasddasoidjasiodasdjaiodd',
       saveUninitialized: false,
       resave: false,
       cookie: {
-        maxAge: 60000,
+        maxAge: 100000,
       },
     }),
   );

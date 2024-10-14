@@ -4,38 +4,36 @@ import { UserDetails } from 'src/utils/type';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma:PrismaService){}
+  constructor(private prisma: PrismaService) {}
 
   async validateUser(details: UserDetails) {
-    console.log('AuthService')
-    console.log(details)
+    console.log('AuthService');
+    console.log(details);
 
     const user = await this.prisma.user.findUnique({
-        where: {
-            email: details.email
-        }
-    })
+      where: {
+        email: details.email,
+      },
+    });
 
-    console.log({user})
-    if (user) return user
-    console.log("User not found. Creating...")
+    console.log({ user });
+    if (user) return user;
+    console.log('User not found. Creating...');
 
     const newUser = await this.prisma.user.create({
-        data: {
-            email: details.email,
-            displayName: details.displayName
-        }
-    })
+      data: {
+        email: details.email,
+        name: details.name,
+      },
+    });
+    
 
     return newUser;
   }
 
   async findUser(id: string) {
-    const user = this.prisma.user.findUnique({
-        where: {
-            id
-        }
-    })
-    return user
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
   }
 }

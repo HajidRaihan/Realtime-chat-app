@@ -6,10 +6,15 @@ import { GoogleStrategy } from './utils/GoogleStrategy';
 import { SessionSerializer } from './utils/Serializer';
 
 @Module({
-    controllers: [AuthController],
-    providers: [GoogleStrategy, PrismaService, SessionSerializer, {
-        provide: 'AUTH_SERVICE', 
-        useClass: AuthService
-    }],
+  controllers: [AuthController],
+  providers: [
+    GoogleStrategy,
+    PrismaService,
+    SessionSerializer,
+    {
+      provide: 'AUTH_SERVICE',
+      useClass: AuthService,
+    },
+  ],
 })
 export class AuthModule {}

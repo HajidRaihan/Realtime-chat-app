@@ -13,8 +13,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id        String   @id @default(cuid())
+//   email     String   @unique
+//   name      String? // Tambahkan kolom name, opsional
+//   password  String?
+//   googleId  String?  @unique
+//   avatar    String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
 model User {
-  id          String @id @default(cuid())
-  email       String @unique
-  displayName String
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String? // Optional, for JWT integration
+  googleId  String?  @unique // Nullable, for Google OAuth users
+  avatar    String? // User profile image
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  groups   GroupMember[] // User's groups
+  messages Message[] // Messages sent by user
+  plans    Plan[] // Plans created by user
+  Group    Group[]
+}
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  admin_id String
+  admin    User   @relation(fields: [admin_id], references: [id])
+
+  // Relationships
+  members  GroupMember[] // Users who are members of the group
+  messages Message[] // Messages in the group chat
+  plans    Plan[] // Plans or events created within the group
+}
+
+model GroupMember {
+  id       String   @id @default(cuid())
+  role     String // e.g., 'admin', 'member'
+  joinedAt DateTime @default(now())
+
+  // Relationships
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  group_id String
+  group    Group  @relation(fields: [group_id], references: [id])
+
+  @@unique([user_id, group_id]) // Unique constraint to prevent duplicate memberships
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String // The actual chat message
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  group_id String
+  group    Group  @relation(fields: [group_id], references: [id])
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime // Event or plan date
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  creator_id String
+  creator    User   @relation(fields: [creator_id], references: [id])
+
+  group_id String
+  group    Group  @relation(fields: [group_id], references: [id])
 }
