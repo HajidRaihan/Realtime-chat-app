@@ -1,39 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
-import { UserDetails } from 'src/utils/type';
+import prisma from "../db";
+import bcrypt from "bcrypt";
+import { RegisterUser, LoginUser } from "./types";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-@Injectable()
-export class AuthService {
-  constructor(private prisma: PrismaService) {}
+export const findUser = async () => {
+  const user = await prisma.user.findMany();
 
-  async validateUser(details: UserDetails) {
-    console.log('AuthService');
-    console.log(details);
+  return user;
+};
 
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: details.email,
-      },
-    });
+export const registerUser = async (data: RegisterUser) => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  return prisma.user.create({
+    data: {
+      ...data,
+      password: hashedPassword,
+    },
+  });
+};
 
-    console.log({ user });
-    if (user) return user;
-    console.log('User not found. Creating...');
-
-    const newUser = await this.prisma.user.create({
-      data: {
-        email: details.email,
-        name: details.name,
-      },
-    });
-    
-
-    return newUser;
+export const loginUser = async (creds: LoginUser) => {
+  const user = await prisma.user.findUnique({ where: { email: creds.email } });
+  if (!user) {
+    throw new Error("Invalid email or password");
+  }
+  const isValidPassword = await bcrypt.compare(creds.password, user.password);
+  if (!isValidPassword) {
+    throw new Error("Invalid email or password");
   }
 
-  async findUser(id: string) {
-    return await this.prisma.user.findUnique({
-      where: { id },
-    });
-  }
-}
+  const payload = {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+  };
+
+  const secret = process.env.JWT_SECRET!;
+
+  const expiresIn = 60 * 60 * 1;
+
+  const token = jwt.sign(payload, secret, { expiresIn: expiresIn });
+
+  return { user, token };
+};

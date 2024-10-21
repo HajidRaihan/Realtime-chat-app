@@ -1,47 +1,45 @@
-import { Controller, Get, Post, UseGuards, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GoogleAuthGuard } from './utils/Guard';
-@Controller('auth')
-export class AuthController {
-  @Get('google/login')
-  @UseGuards(GoogleAuthGuard)
-  handleLogin() {
-    return { msg: 'google auth' };
-  }
+import express, { Request, Response } from "express";
+import { findUser, loginUser, registerUser } from "./auth.service";
 
-  @Get('google/redirect')
-  @UseGuards(GoogleAuthGuard)
-  googleLoginCallback(@Req() req, @Res() res) {
-    req.logIn(req.user, (err) => {
-      if (err) {
-        throw err;
-      }
-      return res.redirect('/api'); // Redirect ke halaman yang dilindungi
+const router = express.Router();
+
+router.get("/user", async (req: Request, res: Response) => {
+  const user = await findUser();
+  res.json(user);
+});
+
+// router.post("register", async (req: Request, res: Response) => {
+//   const user = await registerUser(req.body);
+//   return res.status(200).json({
+//     message: "sukses",
+//     data: user,
+//   });
+// });
+
+router.post("/register", async (req: Request, res: Response) => {
+  const user = await registerUser(req.body);
+  res.status(200).json({
+    message: "sukses",
+    data: user,
+  });
+});
+
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const { user, token } = await loginUser({ email, password });
+
+    res.json({
+      data: {
+        id: user.id,
+        email: user.email,
+      },
+      token,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: (error as Error).message });
   }
+});
 
-
-  @Get('status')
-  user(@Req() request: Request) {
-    console.log("ini status")
-    if(request.user){
-      return {msg: 'Authenticated'}
-    } else{
-      return {msg: "Not Authenticated"}
-    }
-  }
-
-
-
-  @Post('logout')
-    logout(@Req() req: Request, @Res() res: Response) {
-        // Menghapus sesi pengguna
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Logout failed' });
-            }
-            // Setelah sesi dihapus, kirim respons sukses
-            return res.status(200).json({ message: 'Logout successful' });
-        });
-    }
-}
+export default router;
