@@ -3,7 +3,7 @@ import chatService from "./chat.service";
 import { Router } from "express";
 const router = Router();
 
-router.post("/chat", async (req: Request, res: Response) => {
+router.post("/create", async (req: Request, res: Response) => {
   try {
     const { senderId, receiverId } = req.body;
     const chat = await chatService.createChat(senderId, receiverId);
@@ -14,13 +14,15 @@ router.post("/chat", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/chat", async (req: Request, res: Response) => {
+router.get("/getAll", async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
-    const chats = await chatService.getUserChat(userId);
+    const chats = await chatService.getAllChats(userId);
     res.status(200).json({ data: chats });
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: (error as Error).message });
   }
 });
+
+export default router;
