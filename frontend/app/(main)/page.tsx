@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Message from "@/components/Message";
 import MessageInput from "@/components/MessageInput";
 import BubbleChat from "@/components/BubbleChat";
+import { io } from "socket.io-client";
+import { useEffect } from "react";
+import Sidebar from "@/components/Sidebar";
 
 export default function Home() {
   return (
