@@ -2,10 +2,12 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import authController from "./auth/auth.controller";
 import chatController from "./chat/chat.controller";
+import messageController from "./message/message.controller";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import chatSocketHandler from "./socket/chatSocket";
+import cors from "cors";
 
 dotenv.config();
 
@@ -20,12 +22,15 @@ const io = new Server(server, {
   },
 });
 
+app.use(cors()); // Use CORS middleware
+
 const port = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authController);
 app.use("/api/chat", chatController);
+app.use("/api/message", messageController);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");

@@ -95,6 +95,37 @@ const getPrivateChatHistory = async (userId: string, chatId: string) => {
     throw new Error("chat not found");
   }
 
+  const messages = await prisma.message.findMany({
+    where: {
+      chatId,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+    include: {
+      sender: {
+        select: {
+          id: true,
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+
+  const chatHistory = messages.map((message) => ({
+    messageId: message.id,
+    content: message.content,
+    sender: {
+      id: message.sender.id,
+      username: message.sender.username,
+      avatar: message.sender.avatar,
+    },
+    createdAt: message.createdAt,
+  }));
+
+  return messages;
+
   //! lanjotttt
 };
 
@@ -102,4 +133,5 @@ export default {
   createChat,
   getUserChat,
   getAllChats,
+  getPrivateChatHistory,
 };

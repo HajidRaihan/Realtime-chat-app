@@ -11,3 +11,7 @@ const createMessage = async (chatId: string, senderId: string, content: string) 
 
   return message;
 };
+
+export default {
+    createMessage
+}

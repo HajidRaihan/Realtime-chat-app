@@ -24,8 +24,6 @@ model User {
   messages      Message[]
   chatsSent     Chat[]    @relation("ChatSender")
   chatsReceived Chat[]    @relation("ChatReceiver")
-  // sentMessages     Message[] @relation("SentMessages")
-  // receivedMessages Message[] @relation("ReceivedMessages")
 }
 
 model Chat {

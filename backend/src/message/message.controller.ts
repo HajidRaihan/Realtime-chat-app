@@ -3,7 +3,7 @@ import messageService from "./message.service";
 import { Router } from "express";
 const router = Router();
 
-router.post("message", async (req: Request, res: Response) => {
+router.post("/message", async (req: Request, res: Response) => {
   try {
     const { chatId, senderId, content } = req.body;
 
@@ -18,3 +18,5 @@ router.post("message", async (req: Request, res: Response) => {
     res.status(401).json({ error: error });
   }
 });
+
+export default router;
