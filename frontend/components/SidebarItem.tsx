@@ -19,7 +19,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 }) => {
   return (
     <Link href={href}>
-      <Button size={"sm"} className={cn("bg-white", isActive && "bg-mainAccent")}>
+      <Button size={"icon"} className={cn("bg-white", isActive && "bg-main")}>
         <Icon size={20} />
       </Button>
     </Link>

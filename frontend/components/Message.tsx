@@ -4,7 +4,7 @@ import Avatar from "./Avatar";
 interface MessageProps {
   avatar: string;
   title: string;
-  content: string;
+  content?: string;
 }
 
 const Message: React.FC<MessageProps> = ({ avatar, title, content }) => {
@@ -16,7 +16,7 @@ const Message: React.FC<MessageProps> = ({ avatar, title, content }) => {
       />
       <div>
         <h3 className="text-md font-semibold">{title}</h3>
-        <p className="text-xs truncate w-52">{content}</p>
+        {content && <p className="text-xs truncate w-52">{content}</p>}
       </div>
     </div>
   );

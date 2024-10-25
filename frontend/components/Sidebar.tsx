@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
   );
   return (
     <div className="flex h-full">
-      <div className="relative bg-main items-center flex-shrink-0 min-h-screen flex flex-col gap-y-3 border-r-2 border-black h-full w-20 p-2">
+      <div className="relative bg-main items-center flex-shrink-0 min-h-screen flex flex-col gap-y-3 border-r-2 border-black h-full w-16 p-2">
         {routes.map((item) => (
           <SidebarItem key={item.label} {...item} />
         ))}

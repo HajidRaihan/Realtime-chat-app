@@ -21,45 +21,28 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useLogin } from "@/features/auth/useLogin";
-import { useRouter } from "next/navigation";
-import { VscLoading } from "react-icons/vsc";
+import { useRegiser } from "@/features/auth/useRegister";
+import ButtonSubmit from "@/components/ButtonSubmit";
 import toast, { Toaster } from "react-hot-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
-import ButtonSubmit from "@/components/ButtonSubmit";
 
-const loginFormSchema = z.object({
+const registerFormSchema = z.object({
+  username: z.string().min(5, "username minimal 5 karakter"),
   email: z.string().email(),
   password: z.string(),
 });
 
-type LoginFormSchema = z.infer<typeof loginFormSchema>;
+type RegisterFormSchema = z.infer<typeof registerFormSchema>;
 
-const Login = () => {
-  const router = useRouter();
-  // const { toast } = useToast();
-
-  const { mutate, isPending } = useLogin({
+const Register = () => {
+  const { mutate, isPending } = useRegiser({
     onSuccess: () => {
-      toast.custom(
-        (t) => (
-          <Alert
-            variant="destructive"
-            className={`${
-              t.visible ? "animate-enter" : "animate-leave"
-            } bg-green-600 text-white w-72`}
-          >
-            <AlertTitle className="text-white">Success</AlertTitle>
-            <AlertDescription className="text-white">Login Success</AlertDescription>
-          </Alert>
-        ),
-        {
-          duration: 3000,
-          position: "top-center",
-        }
-      );
-      router.push("/");
+      toast.success("Login successful!", {
+        duration: 4000,
+        position: "top-center",
+      });
+      // router.push("/");
     },
     onError: (error: string) => {
       toast.custom(
@@ -77,20 +60,20 @@ const Login = () => {
           </Alert>
         ),
         {
-          duration: 3000,
+          duration: 4000,
           position: "top-center",
         }
       );
     },
   });
 
-  const form = useForm<LoginFormSchema>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<RegisterFormSchema>({
+    resolver: zodResolver(registerFormSchema),
   });
 
   const { handleSubmit, control } = form;
 
-  const onSubmit = (data: LoginFormSchema) => {
+  const onSubmit = (data: RegisterFormSchema) => {
     console.log("Submitted Data: ", data);
     mutate(data);
   };
@@ -99,8 +82,8 @@ const Login = () => {
     <Card className="w-[350px]">
       <Toaster />
       <CardHeader>
-        <CardTitle className="text-3xl">Login</CardTitle>
-        <CardDescription>Welcome to SIRKEL!</CardDescription>
+        <CardTitle className="text-3xl">Register</CardTitle>
+        {/* <CardDescription></CardDescription> */}
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -108,12 +91,25 @@ const Login = () => {
             <div className="grid w-full items-center gap-4">
               <FormField
                 control={control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor={field.name}>Username</FormLabel>
+                    <FormControl>
+                      <Input id={field.name} placeholder="Username" type="text" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel htmlFor={field.name}>Email</FormLabel>
                     <FormControl>
-                      <Input id={field.name} placeholder="Email" {...field} />
+                      <Input id={field.name} placeholder="email" type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,18 +132,16 @@ const Login = () => {
             </div>
             <div className="flex justify-between mt-4">
               {/* <Button variant="outline">Cancel</Button> */}
-              {/* <Button type="submit" className="w-full font-bold gap-2" disabled={isPending}>
-                {isPending && <VscLoading className="animate-spin" size={15} />}
-                Login
-              </Button> */}
-              <ButtonSubmit isLoading={isPending} title="Login" />
+
+              <ButtonSubmit isLoading={isPending} title="Register" />
+              {/* {isPending && <p>loading</p>} */}
             </div>
             <div className="mt-5 flex justify-center">
               <Link
-                href={"/register"}
+                href={"/login"}
                 className="text-xs hover:text-gray-600 hover:font-bold cursor-pointer"
               >
-                don't have an account? Register
+                already have an account? Login
               </Link>
             </div>
           </form>
@@ -157,4 +151,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
