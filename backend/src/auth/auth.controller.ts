@@ -17,11 +17,15 @@ router.get("/user", async (req: Request, res: Response) => {
 // });
 
 router.post("/register", async (req: Request, res: Response) => {
-  const user = await registerUser(req.body);
-  res.status(200).json({
-    message: "sukses",
-    data: user,
-  });
+  try {
+    const user = await registerUser(req.body);
+    res.status(200).json({
+      message: "sukses",
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
 });
 
 router.post("/login", async (req: Request, res: Response) => {

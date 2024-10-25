@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import authController from "./auth/auth.controller";
+import userController from "./user/user.controller";
 import chatController from "./chat/chat.controller";
 import messageController from "./message/message.controller";
 import cookieParser from "cookie-parser";
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authController);
+app.use("/api/user", userController);
 app.use("/api/chat", chatController);
 app.use("/api/message", messageController);
 
