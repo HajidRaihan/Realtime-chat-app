@@ -2,7 +2,7 @@ import { axiosInstance } from "@/lib/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 
-export const useFetchUserActive = () => {
+export const useFetchUserActive = (username?: string) => {
   return useQuery({
     queryFn: async () => {
       try {
@@ -13,7 +13,15 @@ export const useFetchUserActive = () => {
           },
         };
 
-        const res = await axiosInstance.get(`/user/active`, config);
+        let params = [];
+
+        if (username) {
+          params.push(`username=${username}`);
+        }
+
+        const path = `/user/active?${params.join("&")}`;
+
+        const res = await axiosInstance.get(path, config);
         console.log(res);
         return res.data.data;
       } catch (error) {

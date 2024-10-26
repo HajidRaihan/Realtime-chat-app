@@ -4,7 +4,7 @@ import Avatar from "./Avatar";
 interface BubbleChatProps {
   message: string;
   username?: string;
-  avatar: string;
+  avatar?: string;
   isUserMessage?: boolean; // Tambahkan prop untuk menandai pesan user
 }
 
