@@ -13,7 +13,9 @@ export const useFtechAllChats = () => {
       });
 
       console.log("all chat", res.data);
-      return res.data;
+
+      const filteredResponse = res.data.data.filter((item: any) => item.lastMessage !== null);
+      return filteredResponse;
     },
   });
 };

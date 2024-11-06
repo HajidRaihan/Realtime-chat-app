@@ -18,7 +18,7 @@ import { Input } from "./ui/input";
 interface NewChatAlertDialogProps {
   users: User[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  userOnClick: (userid: string) => void;
+  userOnClick: (userid: string, username: string) => void;
   isLoading: boolean;
   setOpen: (open: boolean) => void;
   open: boolean;
@@ -57,7 +57,7 @@ const NewChatAlertDialog: React.FC<NewChatAlertDialogProps> = ({
                     key={user.id}
                     avatar="https://media.hitekno.com/thumbs/2022/07/19/93338-one-piece-monkey-d-luffy/730x480-img-93338-one-piece-monkey-d-luffy.jpg"
                     title={user.username}
-                    onClick={() => userOnClick(user.id)}
+                    onClick={() => userOnClick(user.id, user.username)}
                   />
                 ))}
                 {isLoading && <p>....</p>}

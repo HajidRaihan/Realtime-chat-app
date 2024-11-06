@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import Avatar from "./Avatar";
+// import Avatar from "@/components/Avatar";
+
 
 interface BubbleChatProps {
   message: string;
