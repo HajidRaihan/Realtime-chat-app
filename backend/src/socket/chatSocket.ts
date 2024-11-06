@@ -9,9 +9,18 @@ const chatSocketHandler = (io: Server) => {
       console.log("tetrrrtrtrt", chatId);
     });
 
+    socket.on("leaveRoom", (chatId: string) => {
+      socket.leave(chatId);
+      console.log(`User left room: ${chatId}`);
+    });
+
     socket.on("sendMessage", (data) => {
-      const { chatId, content } = data;
-      io.to(chatId).emit("newMessage", content);
+      const { chatId, senderId, content } = data;
+      console.log("Sending message to chat room:", chatId, "with content:", content);
+      io.to(chatId).emit("newMessage", { senderId, content }); // Mengirim content yang tepat
+    });
+    socket.on("disconnect", () => {
+      console.log("User disconnected", socket.id);
     });
   });
 };

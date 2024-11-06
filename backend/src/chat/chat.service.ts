@@ -3,15 +3,19 @@ import prisma from "../db";
 const createChat = async (senderId: string, receiverId: string) => {
   const existingChat = await prisma.chat.findFirst({
     where: {
-      senderId: senderId,
-      receiverId: receiverId,
+      OR: [
+        { senderId: senderId, receiverId: receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
     },
   });
 
+  // Jika chat sudah ada, kembalikan chat yang sudah ada
   if (existingChat) {
     return existingChat;
   }
 
+  // Jika belum ada, buat chat baru
   return await prisma.chat.create({
     data: {
       senderId,
@@ -56,30 +60,25 @@ const getAllChats = async (userId: string) => {
   });
 
   const formattedChat = chats.map((chat) => {
+    const partner = userId === chat.sender.id ? chat.receiver : chat.sender;
+    const lastMessage = chat.Message.length > 0 ? chat.Message[0] : null;
+
     return {
       chatId: chat.id,
-      participants: {
-        sender: {
-          id: chat.sender.id,
-          username: chat.sender.username,
-          avatar: chat.sender.avatar,
-        },
-        receiver: {
-          id: chat.receiver.id,
-          username: chat.receiver.username,
-          avatar: chat.receiver.avatar,
-        },
+      partner: {
+        id: partner.id,
+        username: partner.username,
+        avatar: partner.avatar,
       },
-      lastMessage:
-        chat.Message.length > 0
-          ? {
-              content: chat.Message[0].content,
-              createdAt: chat.Message[0].createdAt,
-            }
-          : null,
+      lastMessage: lastMessage
+        ? {
+            content: lastMessage.content,
+            createdAt: lastMessage.createdAt,
+            isUserMessage: lastMessage.senderId === userId, // true jika pesan milik user
+          }
+        : null,
     };
   });
-
   return formattedChat;
 };
 
@@ -91,13 +90,13 @@ const getPrivateChatHistory = async (userId: string, chatId: string) => {
     },
   });
 
-  if (!chat) {
-    throw new Error("chat not found");
-  }
+  // if (!chat) {
+  //   throw new Error("chat not found");
+  // }
 
   const messages = await prisma.message.findMany({
     where: {
-      chatId,
+      chatId: chatId,
     },
     orderBy: {
       createdAt: "asc",
@@ -121,12 +120,37 @@ const getPrivateChatHistory = async (userId: string, chatId: string) => {
       username: message.sender.username,
       avatar: message.sender.avatar,
     },
+    isUserMessage: userId === message.sender.id,
     createdAt: message.createdAt,
   }));
 
-  return messages;
+  return chatHistory;
+};
 
-  //! lanjotttt
+const getChatDetail = async (userId: string, chatId: string) => {
+  const chat = await prisma.chat.findFirst({
+    where: {
+      id: chatId,
+    },
+    include: {
+      sender: true,
+      receiver: true,
+      Message: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
+  });
+
+  if (chat) {
+    chat.Message = chat.Message.map((message) => ({
+      ...message,
+      isUserMessage: message.senderId === userId,
+    }));
+  }
+
+  return chat;
 };
 
 export default {
@@ -134,4 +158,5 @@ export default {
   getUserChat,
   getAllChats,
   getPrivateChatHistory,
+  getChatDetail,
 };

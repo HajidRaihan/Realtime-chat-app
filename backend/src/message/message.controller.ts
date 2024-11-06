@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import messageService from "./message.service";
 import { Router } from "express";
+import { verifyUser } from "../middleware/verifyUser";
 const router = Router();
 
-router.post("/message", async (req: Request, res: Response) => {
+router.post("/:chatId", verifyUser(), async (req: Request, res: Response) => {
   try {
-    const { chatId, senderId, content } = req.body;
+    const { content } = req.body;
 
-    const message = await messageService.createMessage(chatId, senderId, content);
+    const message = await messageService.createMessage(req.params.chatId, req.user || "", content);
 
     res.status(201).json({
       message: "Message created successfully",

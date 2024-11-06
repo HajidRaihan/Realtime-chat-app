@@ -5,7 +5,7 @@ const secret = process.env.JWT_SECRET || "***";
 
 declare module "express-serve-static-core" {
   interface Request {
-    user?: string; // userId will be string
+    user?: string;
   }
 }
 
@@ -20,7 +20,7 @@ export const verifyUser = () => {
 
     try {
       const decode = jwt.verify(token, secret);
-      req.user = (decode as any).userId;
+      req.user = (decode as any).id;
       next();
     } catch (error) {
       res.status(403).json({ message: "Invalid or expired token" });
