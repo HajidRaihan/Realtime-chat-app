@@ -222,7 +222,7 @@ import { IoSearch } from "react-icons/io5";
 
 import NewChatAlertDialog from "@/components/NewChatAlertDialog";
 import { useFetchUserActive } from "@/features/user/useFetchUserActive";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCreateChat } from "@/features/chat/useCreateChat";
 import { useFtechAllChats } from "@/features/chat/useFetchAllChats";
 import { useFetchPrivateChatHistory } from "@/features/chat/useFetchPrivateChatHistory";
@@ -290,16 +290,24 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [usernameChat, setUsernameChat] = useState("");
-  const [messages, setMessages] = useState<MessageHistory[]>([]);
+  // const [messages, setMessages] = useState<MessageHistory[]>([]);
   const [partnerAvatar, setPartnerAvatar] = useState("");
 
   const { data: userActive, isLoading, refetch } = useFetchUserActive(username);
 
   const { data: chatDetail, isLoading: chatDetailIsLoading } = useFetchUserDetail(chatId);
 
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useCreateChat({
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatDetail?.Message]); // Dependency on messages
+
+  const { mutate } = useCreateChat({
     onSuccess: (data: any) => {
       setChatId(data.id);
       setOpen(false);
@@ -442,6 +450,7 @@ export default function Home() {
           username={usernameChat}
           onChange={messageOnChange}
           message={message}
+          ref={chatContainerRef}
         >
           {chatDetail?.Message.map((item: MessageHistory) => (
             <BubbleChat

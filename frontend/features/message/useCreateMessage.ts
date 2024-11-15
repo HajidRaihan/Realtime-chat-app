@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { axiosInstance } from "@/lib/axios";
 import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
